@@ -7,6 +7,7 @@ mod point;
 mod kernel;
 mod particle;
 mod world;
+mod grid;
 
 
 

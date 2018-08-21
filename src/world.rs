@@ -7,6 +7,7 @@ use traits::{
     Update,
     Draw
 };
+use grid::Grid;
 
 pub struct World {
     particles: Vec<Particle>,
@@ -25,6 +26,8 @@ impl Update for World {
         if self.particles.len() < 500 {
             self.particles.push(Particle::new());
         }
+
+        let grid = Grid::new(&self.particles, 0.1f64);
     }
 }
 

@@ -21,7 +21,7 @@ impl EpanechnikovKernel {
 impl Kernel<f64> for EpanechnikovKernel {
     fn kernel_size(mut self, new_size: f64) -> Self {
         self.kernel_size = new_size;
-        self.sq_kernel_size = 1f64 / (new_size * new_size);
+        self.inv_sq_kernel_size = 1f64 / (new_size * new_size);
         self
     }
 

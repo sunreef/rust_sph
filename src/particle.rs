@@ -1,4 +1,4 @@
-use point::Point2f;
+use point::Point2d;
 use traits::{Update, Draw};
 
 use piston_window::*;
@@ -7,13 +7,13 @@ use piston_window::math::*;
 use rand::*;
 
 pub struct Particle {
-    position: Point2f,
+    pub position: Point2d,
 }
 
 impl Particle {
     pub fn new() -> Self {
         Particle {
-            position: Point2f::default(),
+            position: Point2d::default(),
         }
     }
 }
