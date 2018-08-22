@@ -17,52 +17,56 @@ macro_rules! define_point {
     }
 }
 
-macro_rules! dimension_to_coord_pairs {
+macro_rules! get_coord {
+    ($coord_name: ident, $coord_index: expr) => {
+        pub fn $coord_name(&self) -> &T {
+            &self[$coord_index]
+        }
+    }
+}
+
+macro_rules! get_all_coords {
     (1) => {
-        x, 0
+        get_coord!(x, 0);
     };
     (2) => {
-        x, 0, y, 1
+        get_coord!(y, 1);
+        get_all_coords!(1);
     };
     (3) => {
-        x, 0, y, 1, z, 2
+        get_coord!(z, 2);
+        get_all_coords!(2);
     };
     (4) => {
-        x, 0, y, 1, z, 2, w, 3
+        get_coord!(w, 3);
+        get_all_coords!(3);
     };
-}
-
-macro_rules! coords_to_tuple_type {
-    ($i: expr) => { (&T) };
-    ($i: expr, $($r: expr),+) => { (&T, coords_to_tuple_type!($($r),+)) };
-}
-
-
-macro_rules! impl_point_accessors_recursive {
-    ($coord_name: ident: $($coord_index: expr) +) => {
-        pub fn $coord_name(&self) -> coords_to_tuple_type!($($coord_index),+) {
-            ($(&self[$coord_index]),+)
-        }
-    };
-
-    ($coord_name: ident: $($coord_index: expr) +, $($extra_coord_name: ident: $($extra_coord_index: expr) +),+) => {
-        impl_point_accessors_recursive!($coord_name: $($coord_index) +);
-        impl_point_accessors_recursive!($($extra_coord_name: $($extra_coord_index) +), +);
-    }
 }
 
 macro_rules! impl_point_accessors {
-    ($type_name: ident, $($coord_name: ident: $($coord_index: expr) +),+) => {
+    ($type_name: ident, $dimension: tt) => {
         impl<T> $type_name<T> {
-            impl_point_accessors_recursive!($($coord_name: $($coord_index) +), +);
+            get_all_coords!($dimension);
         }
     }
 }
 
+macro_rules! impl_new_point {
+    ($type_name: ident, $($coord_name: tt),+) => {
+        impl<T> $type_name<T> {
+            pub fn new($($coord_name: T),+) -> Self {
+                $type_name {
+                    coords: [$($coord_name),+]
+                }
+            }
+        }
+    }
+}
 
 macro_rules! impl_point {
-    ($type_name: ident, $dimension: expr) => {
+    ($type_name: ident, $dimension: tt) => {
         define_point!($type_name, $dimension);
+        impl_point_accessors!($type_name, $dimension);
 
         impl<T> Index<usize> for $type_name<T> {
             type Output = T;
@@ -106,9 +110,9 @@ impl_point!(Point2, 2);
 impl_point!(Point3, 3);
 impl_point!(Point4, 4);
 
-impl_point_accessors!(Point2, x: 0, y: 1, xy: 0 1, yx: 1 0);
-impl_point_accessors!(Point3, x: 0, y: 1, z: 2, xy: 0 1, xz: 0 2, yz: 1 2, yx: 1 0, zx: 2 0, zy: 2 1, xyz: 0 1 2, yzx: 1 2 0, zxy: 2 0 1, xzy: 1 2 0, zyx: 2 1 0, yxz: 1 0 2);
-impl_point_accessors!(Point4, x: 0, y: 1, z: 2, w: 3);
+impl_new_point!(Point2, x, y);
+impl_new_point!(Point3, x, y, z);
+impl_new_point!(Point4, x, y, z, w);
 
 pub type Point2i = Point2<i32>;
 pub type Point2l = Point2<i64>;
