@@ -16,6 +16,11 @@ impl Particle {
             position: Point2d::default(),
         }
     }
+
+    pub fn position(mut self, new_pos: Point2d) -> Self {
+        self.position = new_pos;
+        self
+    }
 }
 
 impl Update for Particle {
@@ -25,9 +30,7 @@ impl Update for Particle {
 
 impl Draw for Particle {
     fn draw<G: Graphics>(&self, context: &Context, graphics: &mut G) {
-        let x = random::<f64>();
-        let y = random::<f64>();
-        Ellipse::new([1.0,0.0,0.0,1.0]).draw([495.0 * x, 495.0 * y, 5.0,5.0], &context.draw_state, context.transform, graphics);
+        Ellipse::new([1.0,0.0,0.0,1.0]).draw([495.0 * self.position.x(), 495.0 * self.position.y(), 5.0,5.0], &context.draw_state, context.transform, graphics);
     }
 }
 

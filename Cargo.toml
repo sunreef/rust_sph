@@ -6,3 +6,4 @@ authors = ["Victor"]
 [dependencies]
 piston_window = "0.80.0"
 rand = "0.5.5"
+time = "*"

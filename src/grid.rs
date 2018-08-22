@@ -6,6 +6,8 @@ use particle::Particle;
 
 pub struct Grid {
     cell_size: f64,
+    inv_cell_size: f64,
+    bounding_box: (f64, f64, f64, f64),
     cells: Vec<Vec<Vec<usize>>>,
 }
 
@@ -32,11 +34,28 @@ impl Grid {
             }
         }
 
-        Grid {
-            cell_size: cell_size,
-            cells: Vec::new(),
-        }
+        let mut grid =  Grid {
+            cell_size,
+            inv_cell_size: 1.0f64 / cell_size,
+            bounding_box,
+            cells,
+        };
 
+        for (index, particle) in particles.iter().enumerate() {
+            let (x, y) = grid.get_particle_cell(particle);
+            grid.cells[x][y].push(index);
+        }
+        grid
+    }
+
+    fn get_particle_cell(&self, particle: &Particle) -> (usize, usize) {
+        let x = particle.position[0] - self.bounding_box.0;
+        let y = particle.position[1] - self.bounding_box.1;
+
+        let grid_x = (x / self.cell_size).floor() as usize;
+        let grid_y = (y / self.cell_size).floor() as usize;
+
+        (grid_x, grid_y)
     }
 }
 

@@ -6,12 +6,19 @@ macro_rules! define_point {
         pub struct $type_name<T> {
             coords: [T; $dimension]
         }
+
+        impl<T: Default> Default for $type_name<T> {
+            fn default() -> Self {
+                $type_name {
+                    coords: <[T; $dimension]>::default()
+                }
+            }
+        }
     }
 }
 
 macro_rules! impl_point {
     ($type_name: ident, $dimension: expr) => {
-
         define_point!($type_name, $dimension);
 
         impl<T> Index<usize> for $type_name<T> {
@@ -27,13 +34,6 @@ macro_rules! impl_point {
             }
         }
 
-        impl<T: Default> Default for $type_name<T> {
-            fn default() -> Self {
-                $type_name {
-                    coords: <[T; $dimension]>::default()
-                }
-            }
-        }
 
         impl<T: Add<Output = T> + Default + Copy + Clone> Add<$type_name<T>> for $type_name<T> {
             type Output = $type_name<T>;
@@ -62,6 +62,29 @@ macro_rules! impl_point {
 impl_point!(Point2, 2);
 impl_point!(Point3, 3);
 impl_point!(Point4, 4);
+
+impl<T> Point2<T> {
+    pub fn new(x: T, y: T) -> Self {
+        Point2 {
+            coords: [x, y],
+        }
+    }
+
+    pub fn pos(mut self, x: T, y: T) -> Self {
+        self[0] = x;
+        self[1] = y;
+        self
+    }
+
+    pub fn x(&self) -> &T {
+        &self[0]
+    }
+
+    pub fn y(&self) -> &T {
+        &self[1]
+    }
+
+}
 
 pub type Point2i = Point2<i32>;
 pub type Point2l = Point2<i64>;
